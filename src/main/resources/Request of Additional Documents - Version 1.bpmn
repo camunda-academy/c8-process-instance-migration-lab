@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Web Modeler" exporterVersion="0f88a1d" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:process id="AdditionalDocumentRequest" name="Request of Additional Document" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_AdditionalDocumentsNeeded" name="Additional document needed">
+      <bpmn:outgoing>Flow_0e33x1o</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0e33x1o" sourceRef="StartEvent_AdditionalDocumentsNeeded" targetRef="UserTask_RequestAdditionalDocument" />
+    <bpmn:userTask id="UserTask_RequestAdditionalDocument" name="Request additional document">
+      <bpmn:incoming>Flow_0e33x1o</bpmn:incoming>
+      <bpmn:outgoing>Flow_19n68sh</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_19n68sh" sourceRef="UserTask_RequestAdditionalDocument" targetRef="EventBasedGateway" />
+    <bpmn:eventBasedGateway id="EventBasedGateway">
+      <bpmn:incoming>Flow_19n68sh</bpmn:incoming>
+      <bpmn:outgoing>Flow_1rjrpjm</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0anumz3</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:intermediateCatchEvent id="IntermediateMessageCatchEvent_DocumentsReceived" name="Documents received">
+      <bpmn:incoming>Flow_1rjrpjm</bpmn:incoming>
+      <bpmn:outgoing>Flow_0sw41v7</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1hwupn3" messageRef="Message_0a92ruc" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1rjrpjm" sourceRef="EventBasedGateway" targetRef="IntermediateMessageCatchEvent_DocumentsReceived" />
+    <bpmn:intermediateCatchEvent id="IntermediateTimerCatchEvent_Timeout" name="7 days">
+      <bpmn:incoming>Flow_0anumz3</bpmn:incoming>
+      <bpmn:outgoing>Flow_16ojqvu</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0r5p0yl">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P7D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_0anumz3" sourceRef="EventBasedGateway" targetRef="IntermediateTimerCatchEvent_Timeout" />
+    <bpmn:endEvent id="EndEvent_AdditionalDocumentsProvided" name="Additional document provided">
+      <bpmn:incoming>Flow_0sw41v7</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0sw41v7" sourceRef="IntermediateMessageCatchEvent_DocumentsReceived" targetRef="EndEvent_AdditionalDocumentsProvided" />
+    <bpmn:sequenceFlow id="Flow_16ojqvu" sourceRef="IntermediateTimerCatchEvent_Timeout" targetRef="ErrorEndEvent_AdditionalDocumentsNotProvided" />
+    <bpmn:endEvent id="ErrorEndEvent_AdditionalDocumentsNotProvided" name="Additional document not provided">
+      <bpmn:incoming>Flow_16ojqvu</bpmn:incoming>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_12hijxd" errorRef="Error_044o7vg" />
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:message id="Message_0a92ruc" name="documentsReceived">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=applicationId" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:error id="Error_044o7vg" name="Additional document not provided" errorCode="documentNotProvidedError" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="AdditionalDocumentRequest">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_AdditionalDocumentsNeeded">
+        <dc:Bounds x="150" y="100" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="124" y="143" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1xhb2z5_di" bpmnElement="UserTask_RequestAdditionalDocument">
+        <dc:Bounds x="240" y="78" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0u7u13f_di" bpmnElement="EventBasedGateway">
+        <dc:Bounds x="395" y="93" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0zfvdby_di" bpmnElement="IntermediateMessageCatchEvent_DocumentsReceived">
+        <dc:Bounds x="502" y="100" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="492" y="143" width="56" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1mhgbyy_di" bpmnElement="IntermediateTimerCatchEvent_Timeout">
+        <dc:Bounds x="502" y="212" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="504" y="255" width="33" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0ntw9fq_di" bpmnElement="EndEvent_AdditionalDocumentsProvided">
+        <dc:Bounds x="602" y="100" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="596" y="143" width="49" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0a9omkj_di" bpmnElement="ErrorEndEvent_AdditionalDocumentsNotProvided">
+        <dc:Bounds x="602" y="212" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="587" y="255" width="68" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0e33x1o_di" bpmnElement="Flow_0e33x1o">
+        <di:waypoint x="186" y="118" />
+        <di:waypoint x="240" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19n68sh_di" bpmnElement="Flow_19n68sh">
+        <di:waypoint x="340" y="118" />
+        <di:waypoint x="395" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1rjrpjm_di" bpmnElement="Flow_1rjrpjm">
+        <di:waypoint x="445" y="118" />
+        <di:waypoint x="502" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0anumz3_di" bpmnElement="Flow_0anumz3">
+        <di:waypoint x="420" y="143" />
+        <di:waypoint x="420" y="230" />
+        <di:waypoint x="502" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0sw41v7_di" bpmnElement="Flow_0sw41v7">
+        <di:waypoint x="538" y="118" />
+        <di:waypoint x="602" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16ojqvu_di" bpmnElement="Flow_16ojqvu">
+        <di:waypoint x="538" y="230" />
+        <di:waypoint x="602" y="230" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

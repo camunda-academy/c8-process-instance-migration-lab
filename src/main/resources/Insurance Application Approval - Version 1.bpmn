@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Web Modeler" exporterVersion="0f88a1d" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:process id="InsuranceApplicationApproval" name="Insurance Application Approval" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_InsuranceApplicationReceived" name="Insurance application received">
+      <bpmn:outgoing>Flow_0fatayz</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0fatayz" sourceRef="StartEvent_InsuranceApplicationReceived" targetRef="UserTask_DecideAboutApplication" />
+    <bpmn:userTask id="UserTask_DecideAboutApplication" name="Decide about application">
+      <bpmn:incoming>Flow_0fatayz</bpmn:incoming>
+      <bpmn:outgoing>Flow_02e6ftl</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_Decision" name="Decision?">
+      <bpmn:incoming>Flow_02e6ftl</bpmn:incoming>
+      <bpmn:outgoing>Flow_Accepted</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Rejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_02e6ftl" sourceRef="UserTask_DecideAboutApplication" targetRef="Gateway_Decision" />
+    <bpmn:sequenceFlow id="Flow_Accepted" name="Accepted" sourceRef="Gateway_Decision" targetRef="UserTask_IssueApplication">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=decision = "accepted"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="EndEvent_InsuranceApplicationAccepted" name="Insurance application accepted">
+      <bpmn:incoming>Flow_10hdjza</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_10hdjza" sourceRef="UserTask_IssueApplication" targetRef="EndEvent_InsuranceApplicationAccepted" />
+    <bpmn:sequenceFlow id="Flow_Rejected" name="Rejected" sourceRef="Gateway_Decision" targetRef="UserTask_DocumentRejection">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=decision = "rejected"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="UserTask_IssueApplication" name="Issue application">
+      <bpmn:incoming>Flow_Accepted</bpmn:incoming>
+      <bpmn:outgoing>Flow_10hdjza</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="UserTask_DocumentRejection" name="Document rejection">
+      <bpmn:incoming>Flow_Rejected</bpmn:incoming>
+      <bpmn:outgoing>Flow_06t2wa1</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndEvent_InsuranceApplicationRejected" name="Insurance application rejected">
+      <bpmn:incoming>Flow_06t2wa1</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_06t2wa1" sourceRef="UserTask_DocumentRejection" targetRef="EndEvent_InsuranceApplicationRejected" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="InsuranceApplicationApproval">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_InsuranceApplicationReceived">
+        <dc:Bounds x="150" y="100" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="142" y="143" width="53" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17ezb8c_di" bpmnElement="UserTask_DecideAboutApplication">
+        <dc:Bounds x="240" y="78" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0x5z9u9_di" bpmnElement="Gateway_Decision" isMarkerVisible="true">
+        <dc:Bounds x="395" y="93" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="395" y="73" width="49" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_101vfzd_di" bpmnElement="EndEvent_InsuranceApplicationAccepted">
+        <dc:Bounds x="732" y="100" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="724" y="143" width="53" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0mmusjw_di" bpmnElement="UserTask_IssueApplication">
+        <dc:Bounds x="580" y="78" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1idu1m2_di" bpmnElement="UserTask_DocumentRejection">
+        <dc:Bounds x="580" y="190" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1rkh8fe_di" bpmnElement="EndEvent_InsuranceApplicationRejected">
+        <dc:Bounds x="732" y="212" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="724" y="255" width="53" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0fatayz_di" bpmnElement="Flow_0fatayz">
+        <di:waypoint x="186" y="118" />
+        <di:waypoint x="240" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02e6ftl_di" bpmnElement="Flow_02e6ftl">
+        <di:waypoint x="340" y="118" />
+        <di:waypoint x="395" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08mahdw_di" bpmnElement="Flow_Accepted">
+        <di:waypoint x="445" y="118" />
+        <di:waypoint x="580" y="118" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="487" y="100" width="46" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10hdjza_di" bpmnElement="Flow_10hdjza">
+        <di:waypoint x="680" y="118" />
+        <di:waypoint x="732" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ta0u17_di" bpmnElement="Flow_Rejected">
+        <di:waypoint x="420" y="143" />
+        <di:waypoint x="420" y="230" />
+        <di:waypoint x="580" y="230" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="488" y="213" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06t2wa1_di" bpmnElement="Flow_06t2wa1">
+        <di:waypoint x="680" y="230" />
+        <di:waypoint x="732" y="230" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

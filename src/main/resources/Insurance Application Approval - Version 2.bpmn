@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Web Modeler" exporterVersion="0f88a1d" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.6.0">
+  <bpmn:process id="Process_vvlr1bx" name="Insurance Application Approval" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_InsuranceApplicationReceived" name="Insurance application received">
+      <bpmn:outgoing>Flow_1sxcb8l</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="Gateway_Decision" name="Decision?">
+      <bpmn:incoming>Flow_0j2b07l</bpmn:incoming>
+      <bpmn:outgoing>Flow_Accepted</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Rejected</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1xayw77</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_Accepted" name="Accepted" sourceRef="Gateway_Decision" targetRef="UserTask_IssueApplication">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=decision = "accepted"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="EndEvent_InsuranceApplicationAccepted" name="Insurance application accepted">
+      <bpmn:incoming>Flow_10hdjza</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_10hdjza" sourceRef="UserTask_IssueApplication" targetRef="EndEvent_InsuranceApplicationAccepted" />
+    <bpmn:sequenceFlow id="Flow_Rejected" name="Rejected" sourceRef="Gateway_Decision" targetRef="UserTask_DocumentRejection">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=decision = "rejected"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="UserTask_IssueApplication" name="Issue application">
+      <bpmn:incoming>Flow_Accepted</bpmn:incoming>
+      <bpmn:outgoing>Flow_10hdjza</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="UserTask_DocumentRejection" name="Document rejection">
+      <bpmn:incoming>Flow_Rejected</bpmn:incoming>
+      <bpmn:outgoing>Flow_06t2wa1</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndEvent_InsuranceApplicationRejected" name="Insurance application rejected">
+      <bpmn:incoming>Flow_0uf376n</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_06t2wa1" sourceRef="UserTask_DocumentRejection" targetRef="Gateway_0p98cza" />
+    <bpmn:sequenceFlow id="Flow_1xayw77" name="Additional documents needed" sourceRef="Gateway_Decision" targetRef="CallActivity_RequestOfAdditionalDocuments">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=decision = "additionalDocumentsNeeded"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:callActivity id="CallActivity_RequestOfAdditionalDocuments" name="Request of additional document">
+      <bpmn:extensionElements>
+        <zeebe:calledElement processId="AdditionalDocumentRequest" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1xayw77</bpmn:incoming>
+      <bpmn:outgoing>Flow_1cy8ei3</bpmn:outgoing>
+      <bpmn:property id="Property_03hq84u" name="__targetRef_placeholder" />
+      <bpmn:dataInputAssociation id="DataInputAssociation_1dh23iw">
+        <bpmn:sourceRef>DataObjectReference_1trvven</bpmn:sourceRef>
+        <bpmn:targetRef>Property_03hq84u</bpmn:targetRef>
+      </bpmn:dataInputAssociation>
+      <bpmn:multiInstanceLoopCharacteristics>
+        <bpmn:extensionElements>
+          <zeebe:loopCharacteristics inputCollection="=[ &#34;Salary certificate&#34;, &#34;ID card&#34; ]" inputElement="document" />
+        </bpmn:extensionElements>
+      </bpmn:multiInstanceLoopCharacteristics>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="Gateway_0p98cza">
+      <bpmn:incoming>Flow_06t2wa1</bpmn:incoming>
+      <bpmn:incoming>Flow_00ax8by</bpmn:incoming>
+      <bpmn:outgoing>Flow_0uf376n</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0uf376n" sourceRef="Gateway_0p98cza" targetRef="EndEvent_InsuranceApplicationRejected" />
+    <bpmn:boundaryEvent id="Event_1mm09hb" name="At least one document not provided" attachedToRef="CallActivity_RequestOfAdditionalDocuments">
+      <bpmn:outgoing>Flow_00ax8by</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0wlks0t" errorRef="Error_08xmy5r" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_00ax8by" sourceRef="Event_1mm09hb" targetRef="Gateway_0p98cza" />
+    <bpmn:exclusiveGateway id="Gateway_17adp1f">
+      <bpmn:incoming>Flow_1cy8ei3</bpmn:incoming>
+      <bpmn:incoming>Flow_1sxcb8l</bpmn:incoming>
+      <bpmn:outgoing>Flow_1263yik</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1cy8ei3" sourceRef="CallActivity_RequestOfAdditionalDocuments" targetRef="Gateway_17adp1f" />
+    <bpmn:dataObjectReference id="DataObjectReference_1trvven" name="Needed documents: salary certification, ID card" dataObjectRef="DataObject_0ijjfgq" />
+    <bpmn:dataObject id="DataObject_0ijjfgq" isCollection="true" />
+    <bpmn:sequenceFlow id="Flow_1263yik" sourceRef="Gateway_17adp1f" targetRef="UserTask_DecideAboutApplication" />
+    <bpmn:userTask id="UserTask_DecideAboutApplication" name="Decide about application">
+      <bpmn:incoming>Flow_1263yik</bpmn:incoming>
+      <bpmn:outgoing>Flow_0j2b07l</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1sxcb8l" sourceRef="StartEvent_InsuranceApplicationReceived" targetRef="Gateway_17adp1f" />
+    <bpmn:sequenceFlow id="Flow_0j2b07l" sourceRef="UserTask_DecideAboutApplication" targetRef="Gateway_Decision" />
+  </bpmn:process>
+  <bpmn:error id="Error_08xmy5r" name="Document not provided" errorCode="documentNotProvidedError" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_vvlr1bx">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_InsuranceApplicationReceived">
+        <dc:Bounds x="150" y="150" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="142" y="193" width="53" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0x5z9u9_di" bpmnElement="Gateway_Decision" isMarkerVisible="true">
+        <dc:Bounds x="485" y="143" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="455" y="133" width="49" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_101vfzd_di" bpmnElement="EndEvent_InsuranceApplicationAccepted">
+        <dc:Bounds x="902" y="272" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="893" y="320" width="53" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0mmusjw_di" bpmnElement="UserTask_IssueApplication">
+        <dc:Bounds x="650" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1idu1m2_di" bpmnElement="UserTask_DocumentRejection">
+        <dc:Bounds x="650" y="128" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1rkh8fe_di" bpmnElement="EndEvent_InsuranceApplicationRejected">
+        <dc:Bounds x="902" y="150" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="893" y="193" width="53" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1w3skqm_di" bpmnElement="CallActivity_RequestOfAdditionalDocuments">
+        <dc:Bounds x="650" y="-40" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0p98cza_di" bpmnElement="Gateway_0p98cza" isMarkerVisible="true">
+        <dc:Bounds x="805" y="143" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_1trvven_di" bpmnElement="DataObjectReference_1trvven">
+        <dc:Bounds x="682" y="-135" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="655" y="-197" width="90" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_17adp1f_di" bpmnElement="Gateway_17adp1f" isMarkerVisible="true">
+        <dc:Bounds x="235" y="143" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1wfozd0_di" bpmnElement="UserTask_DecideAboutApplication">
+        <dc:Bounds x="330" y="128" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1bk0j0f_di" bpmnElement="Event_1mm09hb">
+        <dc:Bounds x="732" y="22" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="717" y="65" width="68" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_08mahdw_di" bpmnElement="Flow_Accepted">
+        <di:waypoint x="510" y="193" />
+        <di:waypoint x="510" y="290" />
+        <di:waypoint x="650" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="566" y="272" width="46" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10hdjza_di" bpmnElement="Flow_10hdjza">
+        <di:waypoint x="750" y="290" />
+        <di:waypoint x="902" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ta0u17_di" bpmnElement="Flow_Rejected">
+        <di:waypoint x="535" y="168" />
+        <di:waypoint x="650" y="168" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="568" y="151" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06t2wa1_di" bpmnElement="Flow_06t2wa1">
+        <di:waypoint x="750" y="168" />
+        <di:waypoint x="805" y="168" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xayw77_di" bpmnElement="Flow_1xayw77">
+        <di:waypoint x="510" y="143" />
+        <di:waypoint x="510" y="0" />
+        <di:waypoint x="650" y="0" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="562" y="-50" width="54" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_1dh23iw_di" bpmnElement="DataInputAssociation_1dh23iw">
+        <di:waypoint x="700" y="-85" />
+        <di:waypoint x="700" y="-40" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0uf376n_di" bpmnElement="Flow_0uf376n">
+        <di:waypoint x="855" y="168" />
+        <di:waypoint x="902" y="168" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00ax8by_di" bpmnElement="Flow_00ax8by">
+        <di:waypoint x="768" y="40" />
+        <di:waypoint x="830" y="40" />
+        <di:waypoint x="830" y="143" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1cy8ei3_di" bpmnElement="Flow_1cy8ei3">
+        <di:waypoint x="750" y="0" />
+        <di:waypoint x="830" y="0" />
+        <di:waypoint x="830" y="-220" />
+        <di:waypoint x="260" y="-220" />
+        <di:waypoint x="260" y="143" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1263yik_di" bpmnElement="Flow_1263yik">
+        <di:waypoint x="285" y="168" />
+        <di:waypoint x="330" y="168" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1sxcb8l_di" bpmnElement="Flow_1sxcb8l">
+        <di:waypoint x="186" y="168" />
+        <di:waypoint x="235" y="168" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0j2b07l_di" bpmnElement="Flow_0j2b07l">
+        <di:waypoint x="430" y="168" />
+        <di:waypoint x="485" y="168" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
